@@ -1,6 +1,13 @@
-# Stage 1: capture only. Prove the camera gives raw grayscale.
-import cam
-img = cam.check()
-print("bytes:", len(img))
-print("first 16:", list(img[:16]))
-print("JPEG header!" if img[0] == 0xFF and img[1] == 0xD8 else "looks like pixels")
+# Stage 1: wiring + camera. Text first, then capture and report the byte count.
+import config, cam
+from printer import DP_EH600
+
+p = DP_EH600()
+p.init()
+p.print_text("stage1: printer OK")
+gray = bytearray(config.FRAME_W * config.FRAME_H)
+cam.capture(gray)
+msg = "%d bytes, first: %s" % (len(gray), list(gray[:8]))
+print(msg)
+p.print_text(msg)
+p.feed(config.FEED_LINES)
